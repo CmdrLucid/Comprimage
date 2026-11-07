@@ -1,0 +1,154 @@
+{
+  "@@locale": "en",
+  "appTitle": "Comprimage",
+  "emptyTitle": "Make your photos smaller",
+  "emptyBody": "Pick photos from your gallery and shrink them without visible quality loss. Save space, keep memories.",
+  "pickPhotos": "Select photos",
+  "permissionTitle": "Access to your photos needed",
+  "permissionBody": "Comprimage needs access to your photos to display and compress them. Everything stays on your device.",
+  "grantAccess": "Grant access",
+  "openSettings": "Open settings",
+  "limitedBanner": "You have only granted access to selected photos.",
+  "manageSelection": "Manage",
+  "allPhotos": "All photos",
+  "noPhotos": "No photos found",
+  "selectedCount": "{count, plural, =0{No photo selected} =1{1 photo selected} other{{count} photos selected}}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "continueLabel": "Continue",
+  "clearSelection": "Clear selection",
+  "selectAllLoaded": "Select all loaded",
+  "settingsTitle": "Compression settings",
+  "presets": "Presets",
+  "presetSmall": "Small",
+  "presetMedium": "Medium",
+  "presetHigh": "High",
+  "format": "Output format",
+  "quality": "Quality",
+  "maxEdge": "Maximum edge length",
+  "original": "Original",
+  "pixels": "{px} px",
+  "@pixels": {
+    "placeholders": {
+      "px": {
+        "type": "int"
+      }
+    }
+  },
+  "targetSize": "Target size per photo",
+  "targetSizeHelp": "Optional. Quality is adjusted automatically to stay at or below this size.",
+  "targetSizeOff": "Off",
+  "targetValue": "Size",
+  "unitKb": "KB",
+  "unitMb": "MB",
+  "stripMetadata": "Remove metadata (EXIF/GPS)",
+  "stripMetadataHelp": "Removes location and camera info. WebP never keeps metadata.",
+  "saveMode": "Save mode",
+  "saveCopy": "Save as copy",
+  "saveCopyDesc": "Originals stay untouched. Saved in Pictures/Comprimage.",
+  "saveReplace": "Replace originals",
+  "saveReplaceDesc": "Saves space: originals are deleted after compression (Android asks for confirmation).",
+  "startCompression": "{count, plural, =1{Compress 1 photo} other{Compress {count} photos}}",
+  "@startCompression": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "progressTitle": "Compressing…",
+  "progressOf": "Photo {current} of {total}",
+  "@progressOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "cancelling": "Finishing current photo…",
+  "cancelDialogTitle": "Cancel compression?",
+  "cancelDialogBody": "Photos already processed are kept.",
+  "keepGoing": "Keep going",
+  "resultsTitle": "Result",
+  "totalSaved": "{size} saved",
+  "@totalSaved": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "totalSavedDetail": "{percent} smaller · {before} → {after}",
+  "@totalSavedDetail": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "photosCompressed": "{done} of {total} photos compressed",
+  "@photosCompressed": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "skippedCount": "{count} skipped (not smaller)",
+  "@skippedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "failedCount": "{count} failed",
+  "@failedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPercent": "-{percent}",
+  "@savedPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "notSmaller": "Skipped: result not smaller",
+  "failedItem": "Failed",
+  "originalDeleted": "Original replaced",
+  "originalKept": "Original kept",
+  "targetNotReached": "Target size not reached",
+  "compareTitle": "Before / after",
+  "before": "Before",
+  "after": "After",
+  "done": "Done",
+  "newRun": "New run",
+  "language": "Language",
+  "languageSystem": "System default",
+  "languageEnglish": "English",
+  "languageGerman": "Deutsch",
+  "errorLoading": "Photos could not be loaded"
+}
