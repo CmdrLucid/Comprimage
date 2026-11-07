@@ -96,3 +96,9 @@ Workflow runs do not upload artifacts. APKs are only available through Releases.
 - Develop on `dev`.
 - Release from `main`: merge `dev` into `main`, then tag or run the workflow
   from `main`.
+
+## License
+
+Comprimage is released under the [MIT License](LICENSE). Third-party
+packages keep their own licenses (e.g. `photo_manager`: Apache-2.0,
+`flutter_image_compress`: MIT).
