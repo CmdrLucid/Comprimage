@@ -2,6 +2,8 @@ name: Build & Release APK
 
 on:
   push:
+    branches:
+      - dev
     tags:
       - 'v*'
   workflow_dispatch:
@@ -66,7 +68,9 @@ jobs:
       - name: Build release APK
         run: flutter build apk --release
 
+      # Pushes to dev only verify that the APK builds; releases come from tags or manual runs.
       - name: Determine release tag
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
         id: tag
         env:
           REF_TYPE: ${{ github.ref_type }}
@@ -85,6 +89,7 @@ jobs:
           echo "Release tag: $TAG"
 
       - name: Rename APK
+        if: steps.tag.outputs.tag != ''
         id: apk
         env:
           TAG: ${{ steps.tag.outputs.tag }}
@@ -95,6 +100,7 @@ jobs:
           echo "path=$DEST" >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub Release
+        if: steps.tag.outputs.tag != ''
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
