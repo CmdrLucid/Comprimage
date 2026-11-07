@@ -31,7 +31,10 @@ Session date: 2026-11-07
 ## Notes
 
 - To release: bump `version` in `pubspec.yaml`, merge `dev` into `main`,
-  tag `vX.Y.Z` on `main` and push the tag.
+  then push a `vX.Y.Z` tag (locally) or run the workflow manually on `main`
+  with `version=vX.Y.Z` (agent sessions cannot push tags, see LESSONS.md).
+- Release URL: https://github.com/CmdrLucid/Comprimage/releases/tag/v0.1.0
+- Optional: split APKs per ABI to shrink the 54 MB universal APK.
 
 - `selectAllLoaded` and `newRun` exist in the ARB files but are not used in
   `lib/`. Remove them or wire them up.

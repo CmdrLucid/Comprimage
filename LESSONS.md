@@ -36,3 +36,14 @@ section, or at the end if no section fits.
   `deleteWithIds` call at the end of the run. On Android 11 and newer this
   shows one system confirmation dialog. On Android 10 the confirmation is per
   file.
+
+## Releasing from agent sessions
+
+- **Tag pushes are blocked in cloud agent sessions.** `git push origin vX.Y.Z`
+  fails with HTTP 403 from the session's git proxy, while branch pushes work.
+  Release with `workflow_dispatch` on `main` and the `version` input instead;
+  `softprops/action-gh-release` creates the tag. Humans can still push tags
+  locally.
+- **The universal APK is ~54 MB** because it bundles all ABIs (arm, arm64,
+  x86_64). `flutter build apk --split-per-abi` would cut that to roughly a
+  third per APK if size matters.

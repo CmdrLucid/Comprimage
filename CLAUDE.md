@@ -53,6 +53,11 @@ Verify them in CI (see below).
   Releases.
 - `workflow_dispatch` works only once the workflow file is on `main`
   (see `LESSONS.md`).
+- **Agent sessions cannot push git tags** (the session git proxy returns 403).
+  Release by bumping `version` in `pubspec.yaml`, merging `dev` into `main`,
+  then running the workflow via `workflow_dispatch` on `main` with input
+  `version=vX.Y.Z` (GitHub MCP `actions_run_trigger`). The release step creates
+  the tag itself.
 - Release signing uses the debug key for now. The keystore steps in the
   workflow are commented out.
 
