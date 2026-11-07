@@ -99,6 +99,12 @@ Workflow runs do not upload artifacts. APKs are only available through Releases.
 
 ## License
 
-Comprimage is released under the [MIT License](LICENSE). Third-party
-packages keep their own licenses (e.g. `photo_manager`: Apache-2.0,
-`flutter_image_compress`: MIT).
+Copyright (C) 2026 CmdrLucid
+
+Comprimage is free software: you can redistribute it and/or modify it under
+the terms of the [GNU General Public License v3.0](LICENSE) as published by the
+Free Software Foundation. Modified versions must be released under the same
+license. It is distributed WITHOUT ANY WARRANTY.
+
+Third-party packages keep their own licenses (e.g. `photo_manager`:
+Apache-2.0, `flutter_image_compress`: MIT), both compatible with GPL-3.0.

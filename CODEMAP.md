@@ -8,7 +8,7 @@ moved or removed.
 ```
 Comprimage/
 ├── README.md                         user and developer overview
-├── LICENSE                           MIT license
+├── LICENSE                           GPL-3.0 license
 ├── CLAUDE.md                         guidance for AI agents
 ├── LESSONS.md                        lessons learned
 ├── HANDOFF.md                        session state and next steps

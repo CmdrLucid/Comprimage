@@ -30,7 +30,7 @@ Session date: 2026-11-07
 
 ## Notes
 
-- Licensed under MIT (`LICENSE`); repo is intended to be public.
+- Licensed under GPL-3.0-only (`LICENSE`); repo is intended to be public.
 
 - To release: bump `version` in `pubspec.yaml`, merge `dev` into `main`,
   then push a `vX.Y.Z` tag (locally) or run the workflow manually on `main`
