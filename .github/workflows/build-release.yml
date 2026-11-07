@@ -1,0 +1,106 @@
+name: Build & Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag to publish (e.g. v0.1.0). Leave empty for a dev build.'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # Signing: the release APK is currently signed with the debug key.
+      # To switch to a real keystore later, uncomment this step and make sure
+      # android/app/build.gradle(.kts) reads android/key.properties for the
+      # release signingConfig. The keystore is written to android/app/ so that
+      # the storeFile path below resolves relative to that directory.
+      # - name: Decode keystore and create key.properties
+      #   env:
+      #     KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      #     KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      #     KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      #     KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      #   run: |
+      #     echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+      #     {
+      #       echo "storePassword=$KEYSTORE_PASSWORD"
+      #       echo "keyPassword=$KEY_PASSWORD"
+      #       echo "keyAlias=$KEY_ALIAS"
+      #       echo "storeFile=upload-keystore.jks"
+      #     } > android/key.properties
+
+      - name: Fetch dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Determine release tag
+        id: tag
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          if [ "$REF_TYPE" = "tag" ]; then
+            TAG="$REF_NAME"
+          elif [ -n "$INPUT_VERSION" ]; then
+            TAG="$INPUT_VERSION"
+          else
+            TAG="dev-$RUN_NUMBER"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $TAG"
+
+      - name: Rename APK
+        id: apk
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          SRC=build/app/outputs/flutter-apk/app-release.apk
+          DEST=build/app/outputs/flutter-apk/comprimage-${TAG}.apk
+          mv "$SRC" "$DEST"
+          echo "path=$DEST" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          prerelease: ${{ !startsWith(steps.tag.outputs.tag, 'v') }}
+          files: ${{ steps.apk.outputs.path }}
