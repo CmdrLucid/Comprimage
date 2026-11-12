@@ -48,6 +48,15 @@ section, or at the end if no section fits.
   shows one system confirmation dialog. On Android 10 the confirmation is per
   file.
 
+## Flutter SDK version
+
+- **Unpinned `channel: stable` can break CI overnight.** Flutter 3.50
+  (2026-11-09) deprecated `package:flutter/material.dart`; `flutter analyze`
+  exits non-zero on the resulting infos. CI is pinned to `flutter-version:
+  3.47.9` until the imports move to `package:material_ui`.
+- The cloud container has no Flutter SDK. A shallow clone works:
+  `git clone --depth 1 -b 3.47.9 https://github.com/flutter/flutter.git`.
+
 ## Releasing from agent sessions
 
 - **Tag pushes are blocked in cloud agent sessions.** `git push origin vX.Y.Z`

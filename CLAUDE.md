@@ -25,6 +25,8 @@ flutter build apk --release
 ```
 
 The local container has no Android SDK, so APK builds cannot be verified here.
+It has no Flutter SDK either; clone the pinned version (3.47.9, see the
+workflow and `LESSONS.md`) into the scratchpad to run analyze and tests.
 Verify them in CI (see below).
 
 ## Branch model

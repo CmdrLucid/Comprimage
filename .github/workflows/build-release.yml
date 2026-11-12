@@ -34,6 +34,10 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # Pinned: Flutter 3.50 deprecates package:flutter/material.dart in
+          # favour of package:material_ui, which breaks `flutter analyze`.
+          # Bump after migrating the imports (see LESSONS.md).
+          flutter-version: 3.47.9
           cache: true
 
       # Signing: the release APK is currently signed with the debug key.

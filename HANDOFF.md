@@ -19,14 +19,11 @@ Session date: 2026-11-12
 
 ## Next steps
 
-0. **CI will likely fail at `flutter analyze`.** The current Flutter stable
-   (Dart 3.14, released 2026-11-09) deprecates `package:flutter/material.dart`
-   in favour of `package:material_ui` (and `GlobalCupertinoLocalizations` in
-   favour of `package:cupertino_ui`). That yields 16 `deprecated_member_use`
-   infos across the codebase, and `flutter analyze` exits non-zero on infos.
-   Options: migrate imports to `material_ui`/`cupertino_ui`, or pin
-   `flutter-version` in the workflow. Not caused by the picker fix.
-
+0. Flutter is pinned to 3.47.9 in the workflow (Dart 3.13.7). Flutter 3.50
+   deprecates `package:flutter/material.dart` in favour of
+   `package:material_ui` (and `cupertino_ui`), giving 16
+   `deprecated_member_use` infos that fail `flutter analyze`. Migrate the
+   imports, then remove the pin. Use 3.47.9 locally too.
 1. Test on a real device: gallery permission (including Android 14 partial
    access), both save modes, the replace confirmation, JPEG and WebP output,
    target size, cancel, and before/after compare.
