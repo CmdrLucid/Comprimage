@@ -38,6 +38,16 @@ section, or at the end if no section fits.
   after the albums were loaded never appear (nor do photos whose creation date
   is slightly in the future due to clock or time zone skew). Use
   `DateTimeCond.def().copyWith(ignore: true)` and reload albums on refresh.
+- **Set `ignoreSize: true` on the image `FilterOption`.** Otherwise the
+  Android query adds `width > 0 AND height > 0`. Many camera apps leave these
+  MediaStore columns empty, so their photos never appear, not even after an
+  app restart. This, not the time filter, was why new camera photos were
+  missing in v0.1.1. `AssetEntity.width`/`height` can then be 0; the
+  compression reads the size from the file header instead.
+- **flutter_image_compress scales the raw bitmap before EXIF rotation**, by
+  `max(1, min(w / minWidth, h / minHeight))`. Passing EXIF-rotated target
+  dimensions overshoots the max edge on rotated photos. `compressMinSize`
+  passes the shorter target edge for both values, which is exact either way.
 - **The picker must refresh itself.** It reloads on app resume, on
   `PhotoManager` change notifications (debounced) and on pull-to-refresh.
 

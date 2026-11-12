@@ -18,6 +18,49 @@ CompressFn fakeCompress(
 }
 
 void main() {
+  group('compressMinSize', () {
+    // Mirrors flutter_image_compress on Android: it scales the raw (not EXIF
+    // rotated) bitmap by max(1, min(w / minW, h / minH)).
+    (int, int) simulate(int rawW, int rawH, ({int width, int height}) m) {
+      final scale = [
+        1.0,
+        [rawW / m.width, rawH / m.height].reduce((a, b) => a < b ? a : b),
+      ].reduce((a, b) => a > b ? a : b);
+      return ((rawW / scale).round(), (rawH / scale).round());
+    }
+
+    test('caps the longest edge for landscape and portrait input', () {
+      expect(simulate(4000, 3000, compressMinSize(4000, 3000, 2000)), (
+        2000,
+        1500,
+      ));
+      expect(simulate(3000, 4000, compressMinSize(3000, 4000, 2000)), (
+        1500,
+        2000,
+      ));
+    });
+
+    test('works when dimensions are EXIF rotated relative to the file', () {
+      // File is stored as 4000x3000, asset reports 3000x4000 (rotated).
+      expect(simulate(4000, 3000, compressMinSize(3000, 4000, 2000)), (
+        2000,
+        1500,
+      ));
+    });
+
+    test('keeps the size without a limit, below it, or without dimensions', () {
+      expect(simulate(4000, 3000, compressMinSize(4000, 3000, null)), (
+        4000,
+        3000,
+      ));
+      expect(simulate(1000, 800, compressMinSize(1000, 800, 1920)), (
+        1000,
+        800,
+      ));
+      expect(compressMinSize(0, 0, 2000), (width: 1, height: 1));
+    });
+  });
+
   group('targetDimensions', () {
     test('keeps size when no limit or already small', () {
       expect(targetDimensions(4000, 3000, null), (width: 4000, height: 3000));

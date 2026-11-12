@@ -17,7 +17,13 @@ Session date: 2026-11-12
 - Fixed (2026-11-12): newly taken photos did not appear in the picker. Cause:
   photo_manager's default `createTimeCond` caps at the time the albums were
   loaded. Now ignored; the picker also refreshes on resume, gallery changes
-  and pull-to-refresh, keeping album and selection. Needs device check.
+  and pull-to-refresh, keeping album and selection.
+- v0.1.1 did NOT fix it on the user's device (full access, photo missing even
+  after restart). Real cause: photo_manager's default size filter
+  (`width > 0 AND height > 0`) excludes camera photos without MediaStore
+  dimensions. Fixed with `ignoreSize: true`. Compression now reads missing
+  dimensions from the file and caps the max edge correctly for EXIF-rotated
+  photos (`compressMinSize`). Needs device check.
 
 ## Next steps
 

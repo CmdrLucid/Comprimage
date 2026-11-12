@@ -30,6 +30,12 @@ class GalleryService {
         // taken afterwards (or with a creation date slightly in the future,
         // e.g. due to camera clock or time zone skew) would never show up.
         createTimeCond: DateTimeCond.def().copyWith(ignore: true),
+        // Without ignoreSize, photo_manager adds "width > 0 AND height > 0"
+        // to the query. Many camera apps leave these MediaStore columns empty,
+        // so their photos would never be listed.
+        imageOption: const FilterOption(
+          sizeConstraint: SizeConstraint(ignoreSize: true),
+        ),
         orders: [
           const OrderOption(type: OrderOptionType.createDate, asc: false),
         ],

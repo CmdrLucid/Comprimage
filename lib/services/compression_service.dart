@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
@@ -50,6 +51,21 @@ class TargetSearchResult {
     width: math.max(1, (width * scale).round()),
     height: math.max(1, (height * scale).round()),
   );
+}
+
+/// Returns the `minWidth`/`minHeight` to pass to flutter_image_compress so
+/// that the longest edge ends up at most [edge] (null = keep the size).
+///
+/// flutter_image_compress scales by `min(srcW / minW, srcH / minH)` and never
+/// upscales. Passing the shorter target edge for both values therefore gives
+/// the exact target size whether or not the image is rotated by EXIF, which
+/// matters when [width]/[height] are raw file dimensions. Without known
+/// dimensions, no scaling is possible and the image keeps its size.
+({int width, int height}) compressMinSize(int width, int height, int? edge) {
+  if (width <= 0 || height <= 0) return (width: 1, height: 1);
+  final d = targetDimensions(width, height, edge);
+  final side = math.min(d.width, d.height);
+  return (width: side, height: side);
 }
 
 /// Finds the highest quality (<= [maxQuality]) whose output is at most
@@ -339,6 +355,21 @@ class CompressionService {
     ];
   }
 
+  /// Reads the pixel size from the image header without decoding it.
+  /// Returns 0 x 0 if the format is not supported.
+  Future<({int width, int height})> _readDimensions(String path) async {
+    try {
+      final buffer = await ui.ImmutableBuffer.fromFilePath(path);
+      final descriptor = await ui.ImageDescriptor.encoded(buffer);
+      final dims = (width: descriptor.width, height: descriptor.height);
+      descriptor.dispose();
+      buffer.dispose();
+      return dims;
+    } catch (_) {
+      return (width: 0, height: 0);
+    }
+  }
+
   Future<CompressionResult> _processOne(
     AssetEntity asset,
     String name,
@@ -352,8 +383,16 @@ class CompressionService {
     }
     final originalSize = await file.length();
 
-    final width = asset.orientatedWidth;
-    final height = asset.orientatedHeight;
+    var width = asset.orientatedWidth;
+    var height = asset.orientatedHeight;
+    if (width <= 0 || height <= 0) {
+      // Some camera apps leave width/height empty in MediaStore. Read the
+      // header from the file instead (raw, not EXIF rotated; the longest edge
+      // is the same either way, and compressMinSize copes with rotation).
+      final dims = await _readDimensions(file.path);
+      width = dims.width;
+      height = dims.height;
+    }
     final hasDims = width > 0 && height > 0;
     final longest = hasDims ? math.max(width, height) : null;
     // Only pass an edge limit if it actually shrinks the image.
@@ -363,19 +402,9 @@ class CompressionService {
     }
 
     Future<Uint8List> compress(int quality, int? edge) async {
-      var minW = 1;
-      var minH = 1;
-      if (hasDims) {
-        final d = targetDimensions(width, height, edge);
-        minW = d.width;
-        minH = d.height;
-      } else if (edge != null) {
-        minW = edge;
-        minH = edge;
-      }
-      // flutter_image_compress scales so the image is at least minWidth x
-      // minHeight while keeping the aspect ratio; passing the exact target
-      // dimensions therefore caps the longest edge.
+      final m = compressMinSize(width, height, edge);
+      final minW = m.width;
+      final minH = m.height;
       final data = await FlutterImageCompress.compressWithFile(
         file.path,
         minWidth: minW,
