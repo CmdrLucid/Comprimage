@@ -30,6 +30,17 @@ section, or at the end if no section fits.
   the longest edge, compute the exact target dimensions with
   `targetDimensions` and pass those values.
 
+## Gallery listing (photo_manager)
+
+- **`FilterOptionGroup` freezes "now".** Its default `createTimeCond` is
+  `DateTimeCond.def()`, which caps results at `DateTime.now()` *when the
+  filter is built*. An `AssetPathEntity` keeps that filter, so photos taken
+  after the albums were loaded never appear (nor do photos whose creation date
+  is slightly in the future due to clock or time zone skew). Use
+  `DateTimeCond.def().copyWith(ignore: true)` and reload albums on refresh.
+- **The picker must refresh itself.** It reloads on app resume, on
+  `PhotoManager` change notifications (debounced) and on pull-to-refresh.
+
 ## Saving and deleting originals
 
 - **Replace mode deletes in one batch.** Originals are deleted with a single

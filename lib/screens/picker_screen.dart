@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -30,7 +32,8 @@ class PickerScreen extends StatefulWidget {
   State<PickerScreen> createState() => _PickerScreenState();
 }
 
-class _PickerScreenState extends State<PickerScreen> {
+class _PickerScreenState extends State<PickerScreen>
+    with WidgetsBindingObserver {
   static const int _pageSize = 90;
 
   final ScrollController _scroll = ScrollController();
@@ -43,18 +46,60 @@ class _PickerScreenState extends State<PickerScreen> {
   bool _hasMore = true;
   bool _error = false;
   bool _limited = false;
+  Timer? _refreshDebounce;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _scroll.addListener(_onScroll);
     _init();
+    widget.gallery.watchChanges(_scheduleRefresh);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _refreshDebounce?.cancel();
+    widget.gallery.unwatchChanges();
     _scroll.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Photos may have been taken with the camera app in the meantime.
+    if (state == AppLifecycleState.resumed) _scheduleRefresh();
+  }
+
+  /// Coalesces bursts of change events into a single reload.
+  void _scheduleRefresh() {
+    _refreshDebounce?.cancel();
+    _refreshDebounce = Timer(const Duration(milliseconds: 500), _refresh);
+  }
+
+  /// Reloads albums and the current album, keeping album and selection.
+  Future<void> _refresh() async {
+    if (!mounted || _error) return;
+    try {
+      final albums = await widget.gallery.loadAlbums();
+      if (!mounted) return;
+      final currentId = _album?.id;
+      _albums = albums;
+      _album = albums.isEmpty
+          ? null
+          : albums.firstWhere(
+              (a) => a.id == currentId,
+              orElse: () => albums.first,
+            );
+      if (_album == null) {
+        setState(_assets.clear);
+        return;
+      }
+      await _loadMore(reset: true);
+    } catch (_) {
+      // Keep showing the previous list if the reload fails.
+    }
   }
 
   Future<void> _init() async {
@@ -80,7 +125,6 @@ class _PickerScreenState extends State<PickerScreen> {
     if (reset) {
       _page = 0;
       _hasMore = true;
-      _assets.clear();
     }
     if (!_hasMore) return;
     final page = _page;
@@ -88,6 +132,9 @@ class _PickerScreenState extends State<PickerScreen> {
     final items = await widget.gallery.loadPage(album, page, size: _pageSize);
     if (!mounted || album != _album) return;
     setState(() {
+      // On reset, swap the list only once the first page has arrived, so a
+      // background refresh does not flash an empty grid.
+      if (reset) _assets.clear();
       _assets.addAll(items);
       if (items.length < _pageSize) _hasMore = false;
     });
@@ -223,54 +270,62 @@ class _PickerScreenState extends State<PickerScreen> {
         body: '',
       );
     }
-    return GridView.builder(
-      controller: _scroll,
-      padding: const EdgeInsets.all(2),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 130,
-        mainAxisSpacing: 3,
-        crossAxisSpacing: 3,
-      ),
-      itemCount: _assets.length,
-      itemBuilder: (context, i) {
-        final a = _assets[i];
-        final sel = _selected.containsKey(a.id);
-        return GestureDetector(
-          onTap: () => _toggle(a),
-          child: AnimatedScale(
-            scale: sel ? 0.9 : 1,
-            duration: const Duration(milliseconds: 150),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(sel ? 14 : 4),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  AssetThumb(asset: a),
-                  if (sel)
-                    ColoredBox(color: scheme.primary.withValues(alpha: 0.28)),
-                  Positioned(
-                    top: 6,
-                    right: 6,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: sel ? scheme.primary : Colors.black26,
-                        border: Border.all(color: Colors.white, width: 2),
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: GridView.builder(
+        controller: _scroll,
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(2),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 130,
+          mainAxisSpacing: 3,
+          crossAxisSpacing: 3,
+        ),
+        itemCount: _assets.length,
+        itemBuilder: (context, i) {
+          final a = _assets[i];
+          final sel = _selected.containsKey(a.id);
+          return GestureDetector(
+            onTap: () => _toggle(a),
+            child: AnimatedScale(
+              scale: sel ? 0.9 : 1,
+              duration: const Duration(milliseconds: 150),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(sel ? 14 : 4),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    AssetThumb(asset: a),
+                    if (sel)
+                      ColoredBox(color: scheme.primary.withValues(alpha: 0.28)),
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: sel ? scheme.primary : Colors.black26,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: sel
+                            ? Icon(
+                                Icons.check,
+                                size: 14,
+                                color: scheme.onPrimary,
+                              )
+                            : null,
                       ),
-                      child: sel
-                          ? Icon(Icons.check, size: 14, color: scheme.onPrimary)
-                          : null,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

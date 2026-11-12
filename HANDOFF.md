@@ -1,6 +1,6 @@
 # HANDOFF.md
 
-Session date: 2026-11-07
+Session date: 2026-11-12
 
 ## State
 
@@ -12,8 +12,20 @@ Session date: 2026-11-07
 - CI APK build verified green on `dev` (first build ~11 min).
 - `v0.1.0` released from `main` (debug-signed APK on GitHub Releases).
 - Not yet tested on a real device.
+- Fixed (2026-11-12): newly taken photos did not appear in the picker. Cause:
+  photo_manager's default `createTimeCond` caps at the time the albums were
+  loaded. Now ignored; the picker also refreshes on resume, gallery changes
+  and pull-to-refresh, keeping album and selection. Needs device check.
 
 ## Next steps
+
+0. **CI will likely fail at `flutter analyze`.** The current Flutter stable
+   (Dart 3.14, released 2026-11-09) deprecates `package:flutter/material.dart`
+   in favour of `package:material_ui` (and `GlobalCupertinoLocalizations` in
+   favour of `package:cupertino_ui`). That yields 16 `deprecated_member_use`
+   infos across the codebase, and `flutter analyze` exits non-zero on infos.
+   Options: migrate imports to `material_ui`/`cupertino_ui`, or pin
+   `flutter-version` in the workflow. Not caused by the picker fix.
 
 1. Test on a real device: gallery permission (including Android 14 partial
    access), both save modes, the replace confirmation, JPEG and WebP output,

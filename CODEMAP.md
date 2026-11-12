@@ -36,11 +36,13 @@ Comprimage/
 │   ├── services/
 │   │   ├── compression_service.dart  pure target search and naming; sequential run loop,
 │   │   │                             saving, batch delete, temp copies for compare
-│   │   ├── gallery_service.dart      photo_manager wrapper: permission, albums, paging
+│   │   ├── gallery_service.dart      photo_manager wrapper: permission, albums, paging,
+│   │   │                             change notifications
 │   │   └── locale_controller.dart    user language (system/en/de), persisted
 │   ├── screens/
 │   │   ├── home_screen.dart          start screen, permission gate, language sheet, flow
-│   │   ├── picker_screen.dart        album dropdown, paged grid, multi-select
+│   │   ├── picker_screen.dart        album dropdown, paged grid, multi-select,
+│   │   │                             auto refresh (resume, gallery change, pull)
 │   │   ├── settings_sheet.dart       bottom sheet with per-run settings
 │   │   ├── progress_screen.dart      runs CompressionService, progress ring, cancel
 │   │   ├── results_screen.dart       savings summary and per-photo tiles
