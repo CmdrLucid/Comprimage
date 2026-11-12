@@ -11,6 +11,8 @@ Session date: 2026-11-12
   the release APK build, and publish nothing.
 - CI APK build verified green on `dev` (first build ~11 min).
 - `v0.1.0` released from `main` (debug-signed APK on GitHub Releases).
+- `v0.1.1` released from `main` (2026-11-12): picker shows new photos; CI
+  pinned to Flutter 3.47.9.
 - Not yet tested on a real device.
 - Fixed (2026-11-12): newly taken photos did not appear in the picker. Cause:
   photo_manager's default `createTimeCond` caps at the time the albums were
@@ -44,7 +46,7 @@ Session date: 2026-11-12
 - To release: bump `version` in `pubspec.yaml`, merge `dev` into `main`,
   then push a `vX.Y.Z` tag (locally) or run the workflow manually on `main`
   with `version=vX.Y.Z` (agent sessions cannot push tags, see LESSONS.md).
-- Release URL: https://github.com/CmdrLucid/Comprimage/releases/tag/v0.1.0
+- Release URL: https://github.com/CmdrLucid/Comprimage/releases/tag/v0.1.1
 - Optional: split APKs per ABI to shrink the 54 MB universal APK.
 
 - `selectAllLoaded` and `newRun` exist in the ARB files but are not used in
